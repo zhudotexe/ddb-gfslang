@@ -1,0 +1,51 @@
+feature: ("\n"* statement)* "\n"*
+
+?statement: macro_def | rule_statement
+
+// ==== macros ====
+macro_def: IDENTIFIER ":=" expression
+
+// ==== final rule statements ====
+rule_statement: PRECEDENCE ":" TARGET STATEMENT_OP expression
+PRECEDENCE: NUMBER | SIGNED_NUMBER
+STATEMENT_OP: "=" | "++"  // push operator stolen from Haskell's concat op, e.g. someList ++ 5
+
+?expression: binop
+            | call
+            | literal
+            | target
+            | macro
+            | "(" expression ")"
+
+// ==== arithmetic ====
+?binop: a_num
+
+?a_num: (a_num A_OP)? m_num
+A_OP: "+" | "-"  // subtraction is unfurled in the compiler
+
+?m_num: (m_num M_OP)? expression
+M_OP: "*" | "//" | "/"  // division and floor division is unfurled in the compiler
+
+// ==== variadic argument numbers ====
+call: IDENTIFIER "(" (expression ","?)* ")"
+
+// ==== literals ====
+literal: NUMBER | SIGNED_NUMBER
+
+// ==== names ====
+target: TARGET
+macro: "!" IDENTIFIER
+
+// ==== common terminals ====
+IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]*/
+TARGET: /[a-zA-Z0-9${}.]+/  // doesn't exactly capture the full scope of the JS template literal, but good enough for now
+
+// ==== comments ====
+COMMENT: "#" /[^\n]/* "\n"
+%ignore COMMENT
+
+// ==== lib utils ====
+%import common.NUMBER
+%import common.SIGNED_NUMBER
+%import common.WS_INLINE
+%ignore WS_INLINE
