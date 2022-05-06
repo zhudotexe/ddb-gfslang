@@ -1,7 +1,7 @@
 import contextlib
 import math
 import operator
-from typing import Dict, List, TypeVar
+from typing import Dict, List, TypeVar, Union
 
 from . import errors, gfs_ast, imf_ast
 
@@ -52,6 +52,7 @@ class Compiler:
                 out.append(self.compile_statement(stmt))
         return out
 
+    # ==== macros ====
     def compile_fmacro_def(self, fmacro_def: imf_ast.FunctionalMacroDef):
         if not len(set(fmacro_def.args)) == len(fmacro_def.args):
             raise errors.GFSLCompileError(f"Functional macro argument names must be unique", node=fmacro_def)
@@ -60,6 +61,17 @@ class Compiler:
     def compile_macro_def(self, macro_def: imf_ast.MacroDef):
         self.macros[macro_def.identifier] = self.compile_expression(macro_def.expression)
 
+    def evaluate_maybe_ternary(self, expr: Union[imf_ast.Ternary, imf_ast.Expression]):
+        if isinstance(expr, imf_ast.Ternary):
+            condition = self.evaluate_maybe_ternary(expr.condition)
+            if not isinstance(condition, gfs_ast.StaticExpression):
+                raise errors.GFSLCompileError(f"Cannot use dynamic expressions in compiler macro ternaries", node=expr)
+            if condition.operands:
+                return self.evaluate_maybe_ternary(expr.true)
+            return self.evaluate_maybe_ternary(expr.false)
+        return self.compile_expression(expr)
+
+    # ==== GFS statements ====
     def compile_statement(self, stmt: imf_ast.Statement) -> gfs_ast.Statement:
         if stmt.op == "=":
             op = gfs_ast.StatementOperators.SET
@@ -203,7 +215,7 @@ class Compiler:
         args = [self.compile_expression(arg) for arg in macro_call.args]
         # now, we bind the args to the macro's args and compile the macro
         with self._bind_fmacro_namespace(fmacro, args, calling_node=macro_call):
-            return self.compile_expression(fmacro.expression)
+            return self.evaluate_maybe_ternary(fmacro.expression)
 
 
 def compile(feature: imf_ast.Feature) -> List[gfs_ast.Statement]:

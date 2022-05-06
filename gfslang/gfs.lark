@@ -7,9 +7,16 @@ feature: ("\n"* statement)* "\n"*
 
 static_macro_def: IDENTIFIER ":=" expression
 
-functional_macro_def: fmacro_sig ":=" expression
+functional_macro_def: fmacro_sig ":=" fmacro_expression
 fmacro_sig: IDENTIFIER "(" (fmacro_arg ",")* fmacro_arg? ")"
 fmacro_arg: "!" IDENTIFIER
+
+// --- fmacros special cases ---
+// fmacros have ternaries allowed for recursive applications
+?fmacro_expression: ternary
+                   | expression
+                   | "(" fmacro_expression ")"
+ternary: fmacro_expression "?" fmacro_expression ":" fmacro_expression
 
 // ==== final rule statements ====
 rule_statement: PRECEDENCE ":" TARGET STATEMENT_OP expression

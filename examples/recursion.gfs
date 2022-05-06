@@ -1,0 +1,14 @@
+# the compiler can evaluate static math and recursive compiler macros!
+
+# use 0 as false and non-0 as true
+fib(!n) := max((!n - 2), 0) ? (!fib(!n - 1) + !fib(!n - 2)) : 1
+fac(!n) := max(!n - 1, 0) ? !n * !fac(!n - 1) : 1
+
+0: fib ++ !fib(1)
+1: fib ++ !fib(2)
+2: fib ++ !fib(3)
+3: fib ++ !fib(4)
+4: fib ++ !fib(5)
+5: fib ++ !fib(6)
+
+10: fac5 = !fac(5)

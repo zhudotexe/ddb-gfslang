@@ -38,6 +38,7 @@ class Feature(Node):
         return f"<{type(self).__name__} statements={self.statements!r}>"
 
 
+# ==== macros ====
 class MacroDef(Node):
     def __init__(self, identifier: str, expression: "Expression"):
         self.identifier = identifier
@@ -59,6 +60,19 @@ class FunctionalMacroSig(Node):
         self.args = arg_names
 
 
+class Ternary(Node):
+    def __init__(
+        self,
+        condition: Union["Ternary", "Expression"],
+        true: Union["Ternary", "Expression"],
+        false: Union["Ternary", "Expression"],
+    ):
+        self.condition = condition
+        self.true = true
+        self.false = false
+
+
+# ==== GFS statements ====
 class Statement(Node):
     def __init__(self, precedence: float, target: str, op: str, expression: "Expression"):
         self.precedence = precedence

@@ -15,6 +15,7 @@ from .imf_ast import (
     MacroDef,
     Statement,
     Target,
+    Ternary,
 )
 
 
@@ -26,18 +27,23 @@ class GFSTransformer(Transformer):
     def feature(self, meta: lark.tree.Meta, children):
         return Feature(children).populate_posinfo(meta)
 
+    # ==== macros ====
     def static_macro_def(self, meta: lark.tree.Meta, identifier, expression):
         return MacroDef(str(identifier), expression).populate_posinfo(meta)
 
     def functional_macro_def(self, meta: lark.tree.Meta, signature, expression):
         return FunctionalMacroDef(signature, expression).populate_posinfo(meta)
 
-    def fmacro_sig(self, meta: lark.tree.Meta, identifier: str, *arg_names: str):
-        return FunctionalMacroSig(identifier, *arg_names).populate_posinfo(meta)
+    def fmacro_sig(self, meta: lark.tree.Meta, identifier, *arg_names: str):
+        return FunctionalMacroSig(str(identifier), *arg_names).populate_posinfo(meta)
 
     def fmacro_arg(self, _, identifier):
         return str(identifier)
 
+    def ternary(self, meta: lark.tree.Meta, condition, true, false):
+        return Ternary(condition, true, false).populate_posinfo(meta)
+
+    # ==== GFS statements ====
     def rule_statement(self, meta: lark.tree.Meta, precedence, target, statement_op, expression):
         return Statement(float(precedence), str(target), str(statement_op), expression).populate_posinfo(meta)
 

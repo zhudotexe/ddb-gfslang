@@ -81,6 +81,8 @@ When you can write this?
 0.5: attributes.${statName}.modifier = (attributes.${statName}.value - 10) // 2
 ```
 
+Look in `examples/` for more examples!
+
 ## Grammar
 
 A single GFSLang program is called a "feature," stored in a single `.gfs` file. Each feature is comprised of a list
@@ -102,12 +104,15 @@ Macro names must be valid identifiers (only contain letters, numbers, and unders
 **Functional Macro**
 
 ```
-NAME(arg, arg, arg...) := EXPRESSION
+NAME(arg, arg, arg...) := FMACRO_EXPRESSION
 ```
 
 This creates a functional macro that can be called inside an expression, lazily evaluating the right hand side of the
 definition at call-time. The expressions passed to a functional macro will be bound as macros themselves with the
 argument name for the evaluation of the right hand side.
+
+Functional macros support recursion and JS-like ternary statements (using static expressions only) on their right hand
+side.
 
 The macro name and argument names must be valid identifiers.
 
