@@ -3,7 +3,13 @@ feature: ("\n"* statement)* "\n"*
 ?statement: macro_def | rule_statement
 
 // ==== macros ====
-macro_def: IDENTIFIER ":=" expression
+?macro_def: static_macro_def | functional_macro_def
+
+static_macro_def: IDENTIFIER ":=" expression
+
+functional_macro_def: fmacro_sig ":=" expression
+fmacro_sig: IDENTIFIER "(" (fmacro_arg ",")* fmacro_arg? ")"
+fmacro_arg: "!" IDENTIFIER
 
 // ==== final rule statements ====
 rule_statement: PRECEDENCE ":" TARGET STATEMENT_OP expression
@@ -12,6 +18,7 @@ STATEMENT_OP: "=" | "++"  // push operator stolen from Haskell's concat op, e.g.
 
 ?expression: binop
             | call
+            | macro_call
             | literal
             | target
             | macro
@@ -27,7 +34,8 @@ A_OP: "+" | "-"  // subtraction is unfurled in the compiler
 M_OP: "*" | "//" | "/"  // division and floor division is unfurled in the compiler
 
 // ==== variadic argument numbers ====
-call: IDENTIFIER "(" (expression ","?)* ")"
+call: IDENTIFIER "(" (expression ",")* expression? ")"
+macro_call: "!" IDENTIFIER "(" (expression ",")* expression? ")"
 
 // ==== literals ====
 literal: NUMBER | SIGNED_NUMBER

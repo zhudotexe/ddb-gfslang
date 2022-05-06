@@ -1,3 +1,23 @@
 # test.gfs
-abilityMod := (attributes.${statName}.value - 10) // 2
-0.5: attributes.${statName}.modifier = max(!abilityMod, -5)
+strength := attributes.strength.value
+dexterity := attributes.dexterity.value
+constitution := attributes.constitution.value
+intelligence := attributes.intelligence.value
+wisdom := attributes.wisdom.value
+charisma := attributes.charisma.value
+
+abilityMod(!stat) := (!stat - 10) // 2
+
+strengthMod := !abilityMod(!strength)
+dexterityMod := !abilityMod(!dexterity)
+constitutionMod := !abilityMod(!constitution)
+intelligenceMod := !abilityMod(!intelligence)
+wisdomMod := !abilityMod(!wisdom)
+charismaMod := !abilityMod(!charisma)
+
+0.5: attributes.strength.modifier = max(!strengthMod, -5)
+# 0.5: attributes.dexterity.modifier = !dexterityMod
+# 0.5: attributes.constitution.modifier = !constitutionMod
+# 0.5: attributes.intelligence.modifier = !intelligenceMod
+# 0.5: attributes.wisdom.modifier = !wisdomMod
+# 0.5: attributes.charisma.modifier = !charismaMod

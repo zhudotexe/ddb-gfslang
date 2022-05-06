@@ -88,7 +88,9 @@ of statements.
 
 A statement can either be a final rule, or a compiler macro definition:
 
-**Macro Definition**
+### Macros
+
+**Static Macro**
 
 ```
 (name) := (expression)
@@ -97,7 +99,19 @@ A statement can either be a final rule, or a compiler macro definition:
 This saves an expression to the temporary name *name*, allowing it to be used elsewhere in rule definitions.
 Macro names must be valid identifiers (only contain letters, numbers, and underscore, must not start with a number).
 
-**Final Rules**
+**Functional Macro**
+
+```
+NAME(arg, arg, arg...) := EXPRESSION
+```
+
+This creates a functional macro that can be called inside an expression, lazily evaluating the right hand side of the
+definition at call-time. The expressions passed to a functional macro will be bound as macros themselves with the
+argument name for the evaluation of the right hand side.
+
+The macro name and argument names must be valid identifiers.
+
+### Rules
 
 ```
 (precendence): (target) [=|++] (expression)
@@ -119,7 +133,10 @@ An expression can be any of the following:
     - multiplication
     - division
     - floor division (`//`)
-- a call to a function like `min` or `floor` (e.g. `min(0.5, -10)`)
+- a call to a function like `min` or `floor` (e.g. `min(0.5, -10)`); supported functions:
+    - `max(a[, b, c...])`
+    - `min(a[, b, c...])`
+    - `floor(x)`
 - a literal number (e.g. `0.5`, `-10`)
 - a target name (e.g. `attributes.${statName}.value`)
 - a macro (e.g. `!halfStrengthMod`)
@@ -129,6 +146,8 @@ An expression can be any of the following:
 Any text following a hash (e.g. `# this is a comment`) is considered a comment and has no semantic meaning in GFSL.
 
 ## Order of Operations
+
+GFSL follows PEMDAS where applicable.
 
 1. GFSLang (string) -> intermediate AST (gfslang.imf_ast) via `gfslang.parse`
 2. intermediate AST -> GFS AST (gfslang.gfs_ast) via `gfslang.compile`

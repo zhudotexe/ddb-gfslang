@@ -47,6 +47,18 @@ class MacroDef(Node):
         return f"<{type(self).__name__} identifier={self.identifier!r} expression={self.expression!r}>"
 
 
+class FunctionalMacroDef(MacroDef):
+    def __init__(self, signature: "FunctionalMacroSig", expression: "Expression"):
+        super().__init__(signature.identifier, expression)
+        self.args = signature.args
+
+
+class FunctionalMacroSig(Node):
+    def __init__(self, identifier: str, *arg_names: str):
+        self.identifier = identifier
+        self.args = arg_names
+
+
 class Statement(Node):
     def __init__(self, precedence: float, target: str, op: str, expression: "Expression"):
         self.precedence = precedence
@@ -106,3 +118,13 @@ class Macro(Expression):
 
     def __repr__(self):
         return f"<{type(self).__name__} !{self.name}>"
+
+
+class MacroCall(Expression):
+    def __init__(self, name: str, *args: Expression):
+        self.name = name
+        self.args = args
+
+    def __repr__(self):
+        arg_str = ", ".join(repr(arg) for arg in self.args)
+        return f"<{type(self).__name__} !{self.name}({arg_str})>"

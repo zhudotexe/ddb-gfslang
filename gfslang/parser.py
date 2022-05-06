@@ -3,7 +3,19 @@ import os
 import lark
 from lark import Lark, Transformer, v_args
 
-from .imf_ast import BinOp, Call, Feature, Literal, Macro, MacroDef, Statement, Target
+from .imf_ast import (
+    BinOp,
+    Call,
+    Feature,
+    FunctionalMacroDef,
+    FunctionalMacroSig,
+    Literal,
+    Macro,
+    MacroCall,
+    MacroDef,
+    Statement,
+    Target,
+)
 
 
 # ===== transformer, parser -> IMF ast =====
@@ -14,8 +26,17 @@ class GFSTransformer(Transformer):
     def feature(self, meta: lark.tree.Meta, children):
         return Feature(children).populate_posinfo(meta)
 
-    def macro_def(self, meta: lark.tree.Meta, identifier, expression):
+    def static_macro_def(self, meta: lark.tree.Meta, identifier, expression):
         return MacroDef(str(identifier), expression).populate_posinfo(meta)
+
+    def functional_macro_def(self, meta: lark.tree.Meta, signature, expression):
+        return FunctionalMacroDef(signature, expression).populate_posinfo(meta)
+
+    def fmacro_sig(self, meta: lark.tree.Meta, identifier: str, *arg_names: str):
+        return FunctionalMacroSig(identifier, *arg_names).populate_posinfo(meta)
+
+    def fmacro_arg(self, _, identifier):
+        return str(identifier)
 
     def rule_statement(self, meta: lark.tree.Meta, precedence, target, statement_op, expression):
         return Statement(float(precedence), str(target), str(statement_op), expression).populate_posinfo(meta)
@@ -40,6 +61,9 @@ class GFSTransformer(Transformer):
 
     def macro(self, meta: lark.tree.Meta, identifier: lark.Token):
         return Macro(identifier.value).populate_posinfo(meta)
+
+    def macro_call(self, meta: lark.tree.Meta, identifier: lark.Token, *args):
+        return MacroCall(identifier.value, *args).populate_posinfo(meta)
 
 
 with open(os.path.join(os.path.dirname(__file__), "gfs.lark")) as f:

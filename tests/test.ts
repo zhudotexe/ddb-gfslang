@@ -1,7 +1,7 @@
 [
     {
         precedence: 0.5,
-        target: `attributes.${statName}.modifier`,
+        target: `attributes.strength.modifier`,
         operator: StatementOperators.SET,
         operand: {
             operator: ExpressionOperators.MAX,
@@ -17,7 +17,7 @@
                                     operands: [
                                         {
                                             operator: ExpressionOperators.DYNAMIC_VALUE,
-                                            operands: `attributes.${statName}.value`
+                                            operands: `attributes.strength.value`
                                         },
                                         {
                                             operator: ExpressionOperators.STATIC_VALUE,
