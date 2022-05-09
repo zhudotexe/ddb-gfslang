@@ -154,15 +154,15 @@ class Compiler:
                 # multiplicative ops with 1 (identity)
                 return expr
             # --- GFS base ops ---
-            case imf_ast.BinOp(left, "+", right):
+            case (left, "+", right):
                 return gfs_ast.Expression(
                     operator=gfs_ast.ExpressionOperators.ADD,
-                    operands=[self.compile_expression(left), self.compile_expression(right)],
+                    operands=[left, right],
                 )
-            case imf_ast.BinOp(left, "*", right):
+            case (left, "*", right):
                 return gfs_ast.Expression(
                     operator=gfs_ast.ExpressionOperators.MULTIPLY,
-                    operands=[self.compile_expression(left), self.compile_expression(right)],
+                    operands=[left, right],
                 )
         raise errors.GFSLFatalCompileError(
             f"Unhandled binary operator pattern: {type(left).__name__} {op!r} {type(right).__name__}", node=binop

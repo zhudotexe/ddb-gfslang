@@ -1,0 +1,4 @@
+# speeds
+abilityMod(!stat) := (!stat - 10) // 2
+hasteModifier := max(1, !abilityMod(attributes.dexterity.value))
+0: speed = baseSpeedModifier * !hasteModifier + 15
